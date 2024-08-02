@@ -1,0 +1,31 @@
+.footer{
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 36rem;
+  height: 100%;
+}
+
+.nickname {
+  padding: 0;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nickname {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.send-button {
+  position: absolute;
+  right: 5px;
+  height: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+}
