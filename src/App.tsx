@@ -1,5 +1,5 @@
 import "./App.css";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { RouterManager } from "./routes/RouteManager";
 import { ThemeProvider } from "./components/theme-provider";
 

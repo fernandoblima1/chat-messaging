@@ -4,35 +4,50 @@ import { ChatList } from "./chat-list";
 import React, { useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
+import { useToast } from "../ui/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
 
 interface ChatProps {
   userLogged: User;
   messages?: Message[];
   isMobile: boolean;
 }
-const socket = new SockJS("http://localhost:8080/ws");
-const stompClient = Stomp.over(socket);
 
 export function Chat({ isMobile, userLogged }: ChatProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
+  const socket = new SockJS("http://localhost:8080/ws");
+  const stompClient = Stomp.over(socket);
+  const { toast } = useToast();
+
   useEffect(() => {
-    stompClient.connect({}, (frame) => {
-      console.log("Connected: " + frame);
-
-      stompClient.subscribe("/topic/public", (message) => {
-        const newMessage = JSON.parse(message.body);
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      });
-    });
-
-    // return () => {
-    //   stompClient.disconnect(() => {
-    //     console.log("Disconnected");
-    //   });
-    // };
+    stompClient.connect({}, onConnected, onError);
   }, []);
+
+  function onConnected() {
+    stompClient.subscribe("/topic/public", onMessageReceived);
+    toast({
+      title: "Isso aí! 🎉",
+      variant: "default",
+      description: "O socket foi conectado com sucesso",
+    });
+  }
+  function onMessageReceived(payload: any) {
+    // let newMessage = {
+
+    // }
+    // setMessages([...messages, JSON.parse(payload.body)]);
+    console.log(payload.body);
+  }
+  function onError(error: any) {
+    toast({
+      title: "Oops... 😢",
+      variant: "destructive",
+      description: "Erro ao conectar ao chat",
+      action: <ToastAction altText="Tentar de novo">Undo</ToastAction>,
+    });
+  }
 
   useEffect(() => {
     if (messagesContainerRef.current) {
@@ -42,7 +57,7 @@ export function Chat({ isMobile, userLogged }: ChatProps) {
   }, [messages]);
 
   const sendMessage = (newMessage: Message) => {
-    stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(newMessage));
+    stompClient.send("/app/chat.send", {}, JSON.stringify(newMessage));
   };
 
   // const sendMessage = (newMessage: Message) => {

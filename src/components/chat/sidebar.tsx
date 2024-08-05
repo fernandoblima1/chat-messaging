@@ -7,8 +7,6 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useState } from "react";
-import { useTheme } from "../theme-provider";
 
 interface SidebarProps {
   isCollapsed: boolean;

@@ -5,11 +5,37 @@ import Stomp from "stompjs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-
-const socket = new SockJS("http://localhost:8080/ws");
-const stompClient = Stomp.over(socket);
-
+import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import { useNavigate } from "react-router-dom";
 export default function Home() {
+  const socket = new SockJS("http://localhost:8080/ws");
+  const stompClient = Stomp.over(socket);
+  const { toast } = useToast();
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
+  useEffect(() => {
+    stompClient.connect({}, onConnected, onError);
+  }, []);
+
+  function onConnected() {
+    toast({
+      title: "Isso aí! 🎉",
+      variant: "default",
+      description: "O socket foi conectado com sucesso",
+    });
+  }
+
+  function onError(error: any) {
+    toast({
+      title: "Oops... 😢",
+      variant: "destructive",
+      description: "Erro ao conectar ao chat",
+      action: <ToastAction altText="Tentar de novo">Undo</ToastAction>,
+    });
+  }
+
   return (
     <div className="flex flex-col  items-center w-full h-full">
       <ChatTopbar isHome={true} />
@@ -28,12 +54,16 @@ export default function Home() {
               type="text"
               placeholder="Digite seu username"
               className="border p-2 rounded-md"
+              onChange={(e) => setUsername(e.target.value)}
             />
             <Button
               onClick={() => {
-                stompClient.connect({}, () => {
-                  console.log("Conectado");
-                });
+                stompClient.send(
+                  "/app/chat.register",
+                  {},
+                  JSON.stringify({ sender: username, type: "JOIN" })
+                );
+                navigate("/chat");
               }}
               size={"default"}
               className="bg-blue-700 text-white font-extrabold hover:bg-blue-900"
