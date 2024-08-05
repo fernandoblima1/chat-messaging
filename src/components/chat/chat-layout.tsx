@@ -31,7 +31,7 @@ export function ChatLayout() {
   return (
     <>
       {!isMobile && <Sidebar isCollapsed={isCollapsed} links={onlineUsers} />}
-      <Chat messages={messages} isMobile={isMobile} userLogged={userLoggedIn} />
+      <Chat isMobile={isMobile} userLogged={userLoggedIn} />
     </>
   );
 }
