@@ -1,43 +1,61 @@
 import ChatTopbar from "@/components/chat/chat-topbar";
 import "./index.css";
-import SockJS from "sockjs-client";
-import Stomp from "stompjs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import { useNavigate } from "react-router-dom";
+import { User } from "@/app/data";
+import { useToast } from "@/components/ui/use-toast";
+
 export default function Home() {
-  const socket = new SockJS("http://localhost:8080/ws");
-  const stompClient = Stomp.over(socket);
-  const { toast } = useToast();
   const [username, setUsername] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  useEffect(() => {
-    stompClient.connect({}, onConnected, onError);
-  }, []);
+  const { toast } = useToast();
+  const validateUsername = (name: string) => {
+    const regex = /^[a-zA-Z0-9_]*$/;
+    if (!regex.test(name)) {
+      setError("Username só pode possuir letras, números e underline.");
+      return false;
+    }
+    setError("");
+    return true;
+  };
 
-  function onConnected() {
-    toast({
-      title: "Isso aí! 🎉",
-      variant: "default",
-      description: "O socket foi conectado com sucesso",
-    });
-  }
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleEnterChat();
+    }
+  };
 
-  function onError(error: any) {
-    toast({
-      title: "Oops... 😢",
-      variant: "destructive",
-      description: "Erro ao conectar ao chat",
-      action: <ToastAction altText="Tentar de novo">Undo</ToastAction>,
-    });
-  }
+  const handleEnterChat = () => {
+    if (!validateUsername(username)) {
+      toast({
+        title: "Ops! 😅",
+        description: error,
+      });
+      return;
+    }
+    const user: User = {
+      id: Date.now(),
+      name: username,
+      avatar: "/default-avatar.png",
+    };
+
+    navigate("/chat", { state: { user } });
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value.toUpperCase();
+    if (validateUsername(value)) {
+      setUsername(value);
+    }
+  };
 
   return (
-    <div className="flex flex-col  items-center w-full h-full">
+    <div className="flex flex-col items-center w-full h-full">
       <ChatTopbar isHome={true} />
 
       <Card className="flex flex-col gap-4 pt-8 w-96 my-10 rounded-3xl shadow-lg dark:border-none dark:shadow-2xl dark:shadow-black">
@@ -51,20 +69,15 @@ export default function Home() {
         <CardContent>
           <div className="flex flex-col justify-center items-center h-full gap-4">
             <Input
+              onKeyDown={handleKeyPress}
               type="text"
               placeholder="Digite seu username"
               className="border p-2 rounded-md"
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleChange}
+              value={username.toUpperCase()}
             />
             <Button
-              onClick={() => {
-                stompClient.send(
-                  "/app/chat.register",
-                  {},
-                  JSON.stringify({ sender: username, type: "JOIN" })
-                );
-                navigate("/chat");
-              }}
+              onClick={handleEnterChat}
               size={"default"}
               className="bg-blue-700 text-white font-extrabold hover:bg-blue-900"
             >

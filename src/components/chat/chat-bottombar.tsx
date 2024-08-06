@@ -2,7 +2,7 @@ import { SendHorizontal } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { Message, loggedInUserData } from "@/app/data";
+import { Message, User } from "@/app/data";
 import { Textarea } from "../ui/textarea";
 import { EmojiPicker } from "./emoji-picker";
 import { format } from "date-fns-tz";
@@ -13,11 +13,13 @@ const timeZone = "America/Bahia";
 interface ChatBottombarProps {
   sendMessage: (newMessage: Message) => void;
   isMobile: boolean;
+  userLogged: User;
 }
 
 export default function ChatBottombar({
   sendMessage,
   isMobile,
+  userLogged,
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -26,16 +28,18 @@ export default function ChatBottombar({
     setMessage(event.target.value);
   };
 
-  const handleSend = () => {
+  const handleSend = (event?: React.MouseEvent | React.KeyboardEvent) => {
+    if (event) {
+      event.preventDefault();
+    }
     if (message.trim()) {
-      // Converta o horário atual para o fuso horário desejado
       const timestamp = format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", {
         timeZone,
       });
 
       const newMessage: Message = {
         id: Date.now(), // Use timestamp as ID
-        user: loggedInUserData,
+        user: userLogged,
         content: message.trim(),
         timestamp: timestamp, // Use the formatted timestamp
       };
@@ -50,8 +54,7 @@ export default function ChatBottombar({
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      handleSend();
+      handleSend(event);
     }
 
     if (event.key === "Enter" && event.shiftKey) {
@@ -76,7 +79,7 @@ export default function ChatBottombar({
         <div className="absolute right-2 bottom-0.5">
           <EmojiPicker
             onChange={(value) => {
-              setMessage(message + value);
+              setMessage((prev) => prev + value);
               if (inputRef.current) {
                 inputRef.current.focus();
               }
@@ -85,8 +88,7 @@ export default function ChatBottombar({
         </div>
       </div>
 
-      <a
-        href="#"
+      <button
         className={cn(
           buttonVariants({ variant: "ghost", size: "icon" }),
           "h-9 w-9",
@@ -95,7 +97,7 @@ export default function ChatBottombar({
         onClick={handleSend}
       >
         <SendHorizontal size={20} className="text-muted-foreground" />
-      </a>
+      </button>
     </div>
   );
 }

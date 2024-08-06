@@ -10,11 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface SidebarProps {
   isCollapsed: boolean;
-  links: {
-    id: number;
-    name: string;
-    avatar: string;
-  }[];
+  links: string[];
   onClick?: () => void;
 }
 
@@ -51,14 +47,14 @@ export function Sidebar({ links, isCollapsed }: SidebarProps) {
                     <Avatar>
                       <AvatarFallback
                         className={cn(
-                          getFallbackColor(link.id),
+                          getFallbackColor(link),
                           "dark:text-slate-900 font-extrabold"
                         )}
                       >
-                        {link.name.at(0)}
+                        {link.at(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <span>{link.name}</span>
+                    <span>{link}</span>
                   </a>
                 </TooltipTrigger>
                 <TooltipContent
@@ -66,7 +62,7 @@ export function Sidebar({ links, isCollapsed }: SidebarProps) {
                   sideOffset={20}
                   className="flex items-center gap-4 "
                 >
-                  {link.name}
+                  {link}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -83,11 +79,11 @@ export function Sidebar({ links, isCollapsed }: SidebarProps) {
                     <Avatar>
                       <AvatarFallback
                         className={cn(
-                          getFallbackColor(link.id),
+                          getFallbackColor(link),
                           "dark:text-slate-900 font-extrabold"
                         )}
                       >
-                        {link.name.at(0)}
+                        {link.at(0)}
                       </AvatarFallback>
                     </Avatar>
                   </a>
@@ -97,7 +93,7 @@ export function Sidebar({ links, isCollapsed }: SidebarProps) {
                   sideOffset={20}
                   className="flex items-center gap-4 dark:bg-slate-800 dark:text-slate-100"
                 >
-                  {link.name}
+                  {link}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

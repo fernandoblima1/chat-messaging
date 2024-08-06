@@ -1,6 +1,6 @@
 import { Avatar } from "../ui/avatar";
 import { Info, Phone, Video } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getFallbackColor } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
 import {
   TooltipProvider,
@@ -9,21 +9,48 @@ import {
   TooltipContent,
 } from "@radix-ui/react-tooltip";
 import { ModeToggle } from "../ui/mode-toggle";
+import { AvatarFallback } from "@radix-ui/react-avatar";
 
 export const TopbarIcons = [{ icon: Phone }, { icon: Video }, { icon: Info }];
 interface ChatTopbarProps {
   isHome: boolean;
+  links: string[];
+  isMobile: boolean;
 }
-export default function ChatTopbar({ isHome }: ChatTopbarProps) {
+export default function ChatTopbar({
+  isHome,
+  isMobile,
+  links,
+}: ChatTopbarProps) {
   return (
     <div className="w-full h-20 flex p-4 justify-between items-center border-b">
-      <div className="flex items-center gap-2">
-        <Avatar className="flex justify-center items-center"></Avatar>
-        {!isHome && (
-          <div className="flex flex-col">
-            <span className="text-xs">Sala - W45SDAS</span>
-          </div>
-        )}
+      <div className="flex flex-row space-x-[-10px]">
+        {isMobile &&
+          links.map((link, index) => (
+            <TooltipProvider key={index}>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <a
+                    className={
+                      cn(buttonVariants({ variant: "ghost", size: "icon" })) +
+                      "h-9 w-9 rounded-full "
+                    }
+                  >
+                    <Avatar className="dark:text-slate-900 font-extrabold shadow-lg ">
+                      <AvatarFallback
+                        className={cn(
+                          getFallbackColor(link),
+                          "dark:text-slate-900 font-extrabold w-full h-full flex justify-center items-center "
+                        )}
+                      >
+                        {link.at(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </a>
+                </TooltipTrigger>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
       </div>
 
       <div className="flex flex-row gap-2">

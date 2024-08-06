@@ -54,7 +54,7 @@ export function ChatList({
               addSuffix: true,
               locale: ptBR,
             });
-
+            cn;
             return (
               <motion.div
                 key={index}
@@ -82,7 +82,7 @@ export function ChatList({
                     <Avatar className="flex justify-start items-center">
                       <AvatarFallback
                         className={cn(
-                          getFallbackColor(message.user.id),
+                          getFallbackColor(message.user.name),
                           "dark:text-slate-900 font-extrabold"
                         )}
                       >
@@ -100,7 +100,7 @@ export function ChatList({
                     <Avatar className="flex justify-start items-center">
                       <AvatarFallback
                         className={cn(
-                          getFallbackColor(userLogged.id),
+                          getFallbackColor(userLogged.name),
                           "dark:text-slate-900 font-extrabold"
                         )}
                       >
@@ -114,7 +114,11 @@ export function ChatList({
           })}
         </AnimatePresence>
       </div>
-      <ChatBottombar sendMessage={sendMessage} isMobile={isMobile} />
+      <ChatBottombar
+        sendMessage={sendMessage}
+        isMobile={isMobile}
+        userLogged={userLogged}
+      />
     </div>
   );
 }

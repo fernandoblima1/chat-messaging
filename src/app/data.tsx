@@ -107,3 +107,23 @@ export interface User {
   name: string;
   avatar: string;
 }
+
+export interface MessageContent {
+  id: number;
+  user: User;
+  content: string;
+  timestamp: string;
+}
+
+export interface WebSocketMessage {
+  type: string;
+  content: string;
+  sender: string;
+  timestamp: string;
+}
+
+// export interface WebSocketPayload {
+//   command: string;
+//   body: string;
+
+// }
